@@ -1,0 +1,571 @@
+package BlackJackProgram;
+import java.util.*; 
+public class BlackJackGame {
+
+	public static void main(String[] args) {
+	
+		Scanner getInput = new Scanner(System.in); 
+		
+		Deck myDeck = new Deck(1, true); 
+		
+		
+		/*
+		 *
+		 * // Tried to implement this code but couldnt get it to work with methods, as the players created in the
+		 *  array'd index would not work when applied to methods.
+		 *  additionally getting the index'd array to work with the loops proved to be very tricky. So i just went with the old school
+		 *  independent variables with scanner inputs. This version of my blackjack program is very simple. 
+		System.out.println("How many players? (1-4): ");
+	    int numPlayers = getInput.nextInt();
+
+	    String[] playerNames = new String[numPlayers];
+	    for (int i = 0; i < numPlayers; i++) {
+	      System.out.print("Enter name for player " + (i + 1) + ": ");
+	      String name = getInput.next();
+	      playerNames[i] = name;
+	    }
+
+	    // Create players
+	    Players[] players = new Players[numPlayers];
+	    for (int i = 0; i < numPlayers; i++) {
+	      players[i] = new Players(playerNames[i]);
+	    }*/
+		
+		//Player 1 name and betting amount 
+		System.out.println("Enter the name of player 1"); 
+		String numberOne = getInput.next(); 
+		
+		System.out.println("Enter the betting amount");
+		double player1Money = getInput.nextDouble();
+
+		
+		//player two name and betting amount 
+		System.out.println("Enter the name of player 2"); 
+		String numberTwo = getInput.next(); 
+		
+		System.out.println("Enter the betting amount");
+		double player2Money = getInput.nextDouble();
+		
+		Players player1 = new Players(numberOne); 
+		Players player2 = new Players(numberTwo); 
+		Players dealer = new Players ("Dealer"); 
+		
+		
+		//first card dealt
+		player1.addaCard(myDeck.dealmeaCard()); 
+		player2.addaCard(myDeck.dealmeaCard()); 
+		dealer.addaCard(myDeck.dealmeaCard()); 
+		//second card dealt
+		player1.addaCard(myDeck.dealmeaCard()); 
+		player2.addaCard(myDeck.dealmeaCard()); 
+		dealer.addaCard(myDeck.dealmeaCard());
+		
+System.out.println("The Cards are at Play \n");
+
+		player1.printmyhand(true);
+		System.out.println("\n\n\n");
+
+		player2.printmyhand(true);
+		System.out.println("\n\n\n");
+
+		dealer.printmyhand(false);
+		System.out.println("\n");
+		
+		
+		boolean p1Done = false;
+		boolean p2Done = false;
+		boolean dealerDone = false;
+		
+		/*tried separating the while loop but had to create numerous nested loops and kept getting errors, this is the best I achieved. 
+		 * Either both players can hit or stay.
+		 * Almost like a team blackjack game. I know that was not the requirements but the methods were not working independently for each player. 
+		 * Everything else works.
+		*/
+		
+		while (!p1Done || !p2Done || dealerDone ) {
+			
+				if (!p1Done || !p2Done ) {
+				
+				System.out.println("Would you like to hit or stay?");
+				String horS = getInput.next(); 
+				System.out.println("\n\n\n");
+				
+					if (horS.compareToIgnoreCase("Hit") == 0) {
+					
+					p1Done = !player1.addaCard(myDeck.dealmeaCard());
+					p2Done = !player2.addaCard(myDeck.dealmeaCard());
+					player1.printmyhand(true);
+					player2.printmyhand(true);
+
+					
+						} else {
+						p1Done = true; 
+						p2Done = true; 
+					} 
+			}
+			
+}
+				//dealer's play/ dealers hand
+				
+				if (!dealerDone) {
+					if (dealer.gethandSum()<17) {
+						
+						System.out.println("The Dealer Hits \n \n");
+						dealerDone = !dealer.addaCard(myDeck.dealmeaCard()); 
+						dealer.printmyhand(false);
+					} else {
+						System.out.println("The Dealer Stays \n \n");
+						dealerDone = true; 
+						
+					}
+					System.out.println("\n\n\n");
+
+					
+				} 
+				
+				
+				//all the players get passed to the print my hand method
+				player1.printmyhand(true);
+				System.out.println("\n\n\n");
+
+				
+				player2.printmyhand(true);
+				System.out.println("\n\n\n");
+
+				
+				dealer.printmyhand(true);
+				System.out.println("\n\n\n");
+
+				/*passing Players's cards to the summing calculator, which will add the values of the cards. We are assigning them to a variable 
+				 * 
+				 * 
+				 * */ 
+				int p1Sum = player1.gethandSum();
+				int p2Sum = player1.gethandSum();
+				int dealerSum = player1.gethandSum();
+				
+				
+				// the final decision making and seeing who won, who lost and who wins how much money. If dealer wins, they get all the money. 
+				if (p1Sum > dealerSum && p1Sum <= 21 || dealerSum ==21) {
+					System.out.println(numberOne + " Wins");
+					player1Money = player1Money * 1.5; 
+					System.out.println(numberOne + " Leaves with" + player1Money);
+					
+				} else if (p2Sum > dealerSum && p2Sum <= 21 || dealerSum ==21) { 
+					System.out.println(numberTwo + " Wins");
+					player2Money = player2Money * 1.5; 
+					System.out.println(numberTwo + " Leaves with" + player2Money); 
+					
+				} else {
+					System.out.println("Dealer Wins, All players lost their money");
+
+				}
+				
+				getInput.close();
+
+				
+				
+				
+
+		}
+	}
+
+package BlackJackProgram;
+
+public enum CardTypes {
+	DIAMONDS, 
+	SPADES, 
+	HEARTS, 
+	CLUBS
+
+}
+package BlackJackProgram;
+
+public class Cards {
+
+	// Card types for a single card 
+	
+	public CardTypes cardType; 
+	
+	// Card's Value
+	private int numberValue; 
+	
+	public Cards () {
+		
+		System.out.println("This is a default constructor"); 
+	}
+	
+	
+	//variable constructor for card types, allows instance creation of the class card. 
+	public Cards( CardTypes acardType, int anumberValue) {
+		
+		this.cardType = acardType; 
+		
+		if (anumberValue >= 1 && anumberValue <= 13 ) {
+		this.numberValue = anumberValue; 
+													} // end of if bracket 
+		else { System.err.println( anumberValue + "this is not a valid card");
+		
+		}// end of else bracket 
+	}// end of public Cards constructor
+	
+	//number value returned
+	
+	public int getnumberValue () {
+		
+		return numberValue; 
+		
+	}
+	/*tried using arrays here but the switch statement with the enums made it a lot easier than writing two arrays.
+	 * I was missing something for the arrays
+	 * 
+	 **/
+	public String getcardName() {
+		
+		String valueString = "err"; 
+		
+		switch (this.numberValue) {
+
+		case 1: 
+			valueString = "Ace "; 
+			break; 
+		case 2: 
+			valueString = "Two "; 
+			break; 
+		case 3: 
+			valueString = "Three "; 
+			break; 
+		case 4: 
+			valueString = "Four "; 
+			break; 
+		case 5: 
+			valueString = "Five "; 
+			break; 
+		case 6: 
+			valueString = "Six "; 
+			break; 
+		case 7: 
+			valueString = "Seven "; 
+			break; 
+		case 8: 
+			valueString = "Eight "; 
+			break; 
+		case 9: 
+			valueString = "Nine "; 
+			break; 
+		case 10: 
+			valueString = "Ten "; 
+			break; 
+		case 11 : 
+			valueString = "Jack "; 
+			break; 
+		case 12: 
+			valueString = "King "; 
+			break; 
+		case 13: 
+			valueString = "Queen "; 
+			break; 
+		
+			
+		}
+		
+			return valueString + "of " + cardType;
+		
+	
+		
+		
+		//tried doing it as an array but couldn't figure out how to do it in a case by case basis, need to use switch. 
+		/*String[] valueString = {("Two"), ("Three"), ("Four"), ("Five"), ("Six"), ("Seven"), ("Eight"), ("Nine"), ("Ten"), ("Jack"), ("Queen"), ("King"), ("Ace")};
+		int [] valueNumber = {2,3,4,5,6,7,8,9,10,11,12,13,14};  
+		
+		for ( int i = 0; i <valueNumber.length; i++ ) {
+			
+			for (int j = 0; j<valueString.length; j++) {
+				//got stuck here. 
+				return valueString[j] + "of" + cardType.getcardName();
+			}
+		
+		}*/
+
+		
+		
+		
+	}
+}
+package BlackJackProgram;
+import java.util.*;
+public class Deck {
+
+	private Cards[] deckofCards; //array slots for the cards will be 52
+	private int numberofCards; //this is the dynamically changing value 
+	
+	public Deck() {
+		
+		this(1, false);
+		System.out.println("No Arguements/ Invalid");
+	} // overloading arguements/parameters. 
+	
+	//constructor passing no argument of how many decks and whether or not to shuffle the cards. Collapse
+	
+	public Deck(int numberofDecks, boolean shuffled ) {
+		
+		
+		
+		this.numberofCards = numberofDecks * 52; //52 cards in each deck. 
+		this.deckofCards = new Cards[this.numberofCards]; 
+		
+		int c = 0;
+		
+		for (int i = 0 ; i < numberofDecks; i++) {
+			//card types 
+			for (int j = 0; j<4; j++) { //this marks the loop for the 4 card types, hence the integer 4
+				
+				for (int k = 1; k<=13; k++ ) { //13 different cards Ace, 2 , 3, 4, 5, 6, 7 ,8, 9, 10, Jack, Queen, King. 
+					
+					this.deckofCards[c] = new Cards(CardTypes.values()[j], k); 
+					c++; 
+					
+				}//end of nested loop 2
+				
+				
+			} //end of nested for loop 1
+			
+		} //end of initial for loop 
+		
+		
+		
+		if (shuffled==true)
+		{
+			this.shuffled();
+		}		
+		
+	} 
+	
+	
+	public void shuffled(){
+		Random myShuffler = new Random(); 
+		Cards temp;
+		int a; 
+		for (int i = 0; i< this.numberofCards; i++) { //goes through the 52 cards
+			
+			//range of a is the number of cards, which will be generated randomly
+			a = myShuffler.nextInt(this.numberofCards);
+			
+			//temp will hold the value of a temporarily while we perform the swap 
+			temp = this.deckofCards[i]; 
+			this.deckofCards[i] = this.deckofCards[a]; 
+			this.deckofCards[a] = temp; 
+			
+		} //end of for loop 
+	} //end of shuffled method 
+	
+	//dealer method
+	public Cards dealmeaCard(){
+		
+		Cards top = this.deckofCards[0]; //deals the int value present at the first index, as per a real deck after shuffled. If its not Shuffled it will always be an Ace
+		//the type of top is whatever type we have declared in Card. 
+		
+		//popping the already dealt card, we are using an array not an array list so need to pop. Array list is better. 
+		
+		for (int i = 1; i < this.numberofCards; i++ ){
+			
+			this.deckofCards[i-1] = this.deckofCards[i];  
+			
+		}
+		this.deckofCards[this.numberofCards-1] = null; 
+		
+		this.numberofCards --; 
+		
+		return top; 
+		
+	} 
+	
+	//simply prints the deck. 
+	
+	public void printingtheDeck (int printNum) {
+		
+		for (int a = 0; a < printNum; a++) {
+			
+			System.out.printf("% 3d/%d %s\n", a+1, this.numberofCards, this.deckofCards[a].getcardName()); //pass the numerical value of the card to getCardName
+		} 
+		System.out.printf("\t[%d other]\n", this.numberofCards - printNum);
+
+		
+	} 
+}
+package BlackJackProgram;
+
+public class Players {
+	
+	// Cards in hand 
+	private String playerName; 
+	private Cards[] handofCards = new Cards[10]; 
+	private int numberofCards; 
+	private int maxnumCards = 8; 
+	public Players() {
+		System.out.println("No Arguements");
+		
+	} 
+	
+	public Players(String name) {
+		this.playerName = name; 
+		this.emptyingtheHand(); 
+		
+	} 
+	
+	//reset button
+	
+	public void emptyingtheHand() {
+		
+		for (int a = 0; a < 10; a++ ) {
+			this.handofCards[a] = null; 
+			
+		}
+		this.numberofCards = 0; 
+	}
+	
+	//this method will add a card when the player says hit or stay. Dealer's calculations are based upon optimal blackjack strategy
+	
+	public boolean addaCard(Cards acardType) {
+		
+		if (this.numberofCards == this.maxnumCards) {
+			System.out.println("Hey "+ this.playerName + " you have already have 10 cards, you have reached your limit");
+		}
+		this.handofCards[this.numberofCards] = acardType; 
+		this.numberofCards ++; 
+		
+		return (this.gethandSum() <= 21);
+	}  
+	
+	public int gethandSum(){
+		int handSum = 0; 
+		int cardNumber; 
+		int numberofAces = 0; 
+		
+		
+		//calculate the contribution to sum 
+		
+		for (int c =0; c < this.numberofCards; c++ ) {
+			//current card 
+			
+			cardNumber = this.handofCards[c].getnumberValue(); 
+				if (cardNumber ==1) {
+					numberofAces++; 
+					handSum += 11; 
+				} 
+				else if (cardNumber > 10) {
+					handSum += 10; 
+			
+				}
+				else {
+					handSum += cardNumber; 
+				}
+		} 
+		
+		// while loop will fix the 21 problem. 
+		
+		while (handSum > 21 && numberofAces > 0) {
+			handSum -= 10; 
+			numberofAces--; 
+		} 
+		return handSum; 
+			
+	} 
+	
+	//simple method to print the hand of any player involved. Including dealer which is implemented in the main program. 
+	public void printmyhand (boolean showfirstCard) {
+		System.out.println(this.playerName + "'s Cards:"); 
+		for (int c = 0; c < this.numberofCards; c++) {
+			if (c==0 && !showfirstCard) {
+				System.out.println("    [Hidden]"); 
+			} else {
+				System.out.println(this.handofCards[c].getcardName()); 
+			}
+			
+			
+		} 
+	} 
+	
+}
+
+OutPut:--------------------------------------------------------------------------------------------------------------------------------------------
+Enter the name of player 1
+Pukar
+Enter the betting amount
+200
+Enter the name of player 2
+Dr.Kowalski
+Enter the betting amount
+500
+The Cards are at Play 
+
+Pukar's Cards:
+Six of SPADES
+Ten of SPADES
+
+
+
+
+Dr.Kowalski's Cards:
+Jack of HEARTS
+Four of HEARTS
+
+
+
+
+Dealer's Cards:
+    [Hidden]
+Eight of SPADES
+
+
+Would you like to hit or stay?
+hit
+
+
+
+
+Pukar's Cards:
+Six of SPADES
+Ten of SPADES
+Three of SPADES
+Dr.Kowalski's Cards:
+Jack of HEARTS
+Four of HEARTS
+King of CLUBS
+Would you like to hit or stay?
+stay
+
+
+
+
+The Dealer Stays 
+ 
+
+
+
+
+
+Pukar's Cards:
+Six of SPADES
+Ten of SPADES
+Three of SPADES
+
+
+
+
+Dr.Kowalski's Cards:
+Jack of HEARTS
+Four of HEARTS
+King of CLUBS
+
+
+
+
+Dealer's Cards:
+Queen of DIAMONDS
+Eight of SPADES
+
+
+
+
+Dealer Wins, All players lost their money
